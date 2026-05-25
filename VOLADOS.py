@@ -143,7 +143,7 @@ class SimuladorVoladosApp(ctk.CTk):
 
         self.configurar_estilo_tabla()
         self.crear_interfaz()
-        self.cargar_csv_predeterminado(mostrar_error=False)
+        self.cargar_csv(self.ruta_csv, mostrar_error=False)
 
     # ========================================================
     # INTERFAZ
@@ -285,7 +285,7 @@ class SimuladorVoladosApp(ctk.CTk):
 
         ctk.CTkLabel(
             self.frame_csv,
-            text="Archivo CSV predeterminado",
+            text="Archivo CSV de números",
             font=ctk.CTkFont(size=13, weight="bold")
         ).pack(fill="x", padx=10, pady=(10, 6))
 
@@ -313,8 +313,8 @@ class SimuladorVoladosApp(ctk.CTk):
 
         ctk.CTkButton(
             self.frame_csv,
-            text="Recargar CSV",
-            command=lambda: self.cargar_csv_predeterminado(mostrar_error=True),
+            text="Seleccionar CSV",
+            command=self.seleccionar_csv,
             height=33,
             fg_color="#4b718c",
             hover_color="#36566d"
@@ -546,9 +546,11 @@ class SimuladorVoladosApp(ctk.CTk):
     # ========================================================
     # ARCHIVO CSV Y LECTURA DE NÚMEROS
     # ========================================================
-    def cargar_csv_predeterminado(self, mostrar_error=True):
-        """Carga el CSV que está dentro de DATOS/NUMEROS_ALEATORIOS.csv."""
-        self.ruta_csv = RUTA_CSV_PREDETERMINADA
+    def cargar_csv(self, ruta=None, mostrar_error=True):
+        """Carga el CSV desde la ruta indicada o la predeterminada."""
+        if ruta is None:
+            ruta = RUTA_CSV_PREDETERMINADA
+        self.ruta_csv = ruta
 
         if not os.path.exists(self.ruta_csv):
             self.numeros_por_columna = {}
@@ -556,7 +558,7 @@ class SimuladorVoladosApp(ctk.CTk):
             self.menu_columna.configure(values=["1"])
             self.columna_seleccionada.set("1")
             self.lbl_estado_archivo.configure(
-                text="No encontrado. Colócalo dentro de la carpeta DATOS.",
+                text="No encontrado. Colócalo en DATOS o selecciona otro.",
                 text_color="#b45309"
             )
             self.lbl_info_columna.configure(
@@ -565,9 +567,7 @@ class SimuladorVoladosApp(ctk.CTk):
             if mostrar_error:
                 messagebox.showerror(
                     "Archivo CSV no encontrado",
-                    "No se encontró el archivo:\n\n"
-                    "DATOS/NUMEROS_ALEATORIOS.csv\n\n"
-                    "La carpeta DATOS debe estar junto al archivo Python."
+                    f"No se encontró el archivo:\n\n{self.ruta_csv}"
                 )
             return False
 
@@ -600,6 +600,16 @@ class SimuladorVoladosApp(ctk.CTk):
         )
         self.actualizar_info_columna(seleccion)
         return True
+
+    def seleccionar_csv(self):
+        from tkinter import filedialog
+        archivo = filedialog.askopenfilename(
+            title="Seleccionar archivo CSV de números aleatorios",
+            filetypes=[("Archivos CSV", "*.csv"), ("Todos los archivos", "*.*")]
+        )
+        if archivo:
+            self.lbl_archivo.configure(text=os.path.basename(archivo))
+            self.cargar_csv(archivo, mostrar_error=True)
 
     def analizar_csv(self, ruta):
         filas = []
@@ -661,10 +671,9 @@ class SimuladorVoladosApp(ctk.CTk):
 
     def obtener_numeros(self):
         if self.origen_numeros.get() == "CSV":
-            if not self.cargar_csv_predeterminado(mostrar_error=False):
+            if not self.cargar_csv(self.ruta_csv, mostrar_error=False):
                 raise ValueError(
-                    "No se encontró DATOS/NUMEROS_ALEATORIOS.csv. "
-                    "Coloca la carpeta DATOS junto al archivo Python."
+                    f"No se pudo cargar el archivo CSV: {self.ruta_csv}"
                 )
             columna = int(self.columna_seleccionada.get())
             return self.numeros_por_columna[columna], f"CSV, columna {columna}"

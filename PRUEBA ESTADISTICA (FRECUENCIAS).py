@@ -68,15 +68,26 @@ class PruebaFrecuenciasApp(ctk.CTk):
 
     def verificar_archivo_csv(self):
         if os.path.exists(self.ruta_csv):
+            nombre_archivo = os.path.basename(self.ruta_csv)
             self.lbl_estado_csv.configure(
-                text="Archivo CSV detectado correctamente.",
+                text=f"CSV detectado: {nombre_archivo}",
                 text_color=ESTILOS.GREEN
             )
         else:
             self.lbl_estado_csv.configure(
-                text="Archivo CSV no detectado en DATOS/NUMEROS_ALEATORIOS.csv",
+                text="Archivo CSV no detectado",
                 text_color=ESTILOS.AMBER
             )
+
+    def seleccionar_csv(self):
+        from tkinter import filedialog
+        archivo = filedialog.askopenfilename(
+            title="Seleccionar archivo CSV de números aleatorios",
+            filetypes=[("Archivos CSV", "*.csv"), ("Todos los archivos", "*.*")]
+        )
+        if archivo:
+            self.ruta_csv = archivo
+            self.verificar_archivo_csv()
 
     def crear_interfaz(self):
         # ── PANEL IZQUIERDO (Sidebar - Entrada) ──
@@ -99,7 +110,20 @@ class PruebaFrecuenciasApp(ctk.CTk):
             wraplength=240,
             justify="center"
         )
-        self.lbl_estado_csv.pack(fill="x", padx=20, pady=(0, 15))
+        self.lbl_estado_csv.pack(fill="x", padx=20, pady=(0, 5))
+
+        self.btn_seleccionar_csv = ctk.CTkButton(
+            panel_entrada,
+            text="SELECCIONAR CSV",
+            height=30,
+            fg_color=ESTILOS.CARD,
+            text_color=ESTILOS.WHITE,
+            border_color=ESTILOS.BORDER,
+            border_width=1,
+            hover_color=ESTILOS.PANEL,
+            command=self.seleccionar_csv
+        )
+        self.btn_seleccionar_csv.pack(fill="x", padx=20, pady=(0, 15))
 
         # Parámetros numéricos
         self.ent_n = self.crear_campo(panel_entrada, "N (Cantidad de números):", "40")
