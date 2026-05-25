@@ -1,6 +1,3 @@
-# ==============================================================================
-# VERIFICACIÓN E INSTALACIÓN AUTOMÁTICA DE LIBRERÍAS (Para el Profesor)
-# ==============================================================================
 import importlib
 import subprocess
 import sys

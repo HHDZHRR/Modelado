@@ -1,6 +1,3 @@
-# ==============================================================================
-# VERIFICACIÓN E INSTALACIÓN AUTOMÁTICA DE LIBRERÍAS (Para el Profesor)
-# ==============================================================================
 import importlib
 import subprocess
 import sys
@@ -20,7 +17,6 @@ for pkg, spec in [
             subprocess.check_call([sys.executable, "-m", "pip", "install", spec])
         except Exception as e:
             print(f"Error al instalar {spec}: {e}")
-# ==============================================================================
 
 import customtkinter as ctk
 import numpy as np

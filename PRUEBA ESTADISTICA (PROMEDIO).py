@@ -1,6 +1,3 @@
-# ==============================================================================
-# VERIFICACIÓN E INSTALACIÓN AUTOMÁTICA DE LIBRERÍAS (Para el Profesor)
-# ==============================================================================
 import importlib
 import subprocess
 import sys
@@ -359,11 +356,11 @@ class PruebaPromedioApp(ctk.CTk):
 
         # Aceptación
         if z_0 < z_tabla:
-            conclusion = "Uniformes (Aceptados) ✅"
+            conclusion = "Uniformes (Aceptados) "
             color_conclusion = ESTILOS.GREEN
             self.veredicto_frame.configure(fg_color="#0A3D2E", border_color=ESTILOS.GREEN, border_width=2)
         else:
-            conclusion = "No Uniformes (Rechados) ❌"
+            conclusion = "No Uniformes (Rechados) "
             color_conclusion = ESTILOS.RED
             self.veredicto_frame.configure(fg_color="#3D0A0A", border_color=ESTILOS.RED, border_width=2)
 

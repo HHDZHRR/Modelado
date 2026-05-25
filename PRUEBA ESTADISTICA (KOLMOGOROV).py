@@ -1,6 +1,3 @@
-# ==============================================================================
-# VERIFICACIÓN E INSTALACIÓN AUTOMÁTICA DE LIBRERÍAS (Para el Profesor)
-# ==============================================================================
 import importlib
 import subprocess
 import sys
@@ -385,11 +382,11 @@ class PruebaKolmogorovApp(ctk.CTk):
 
         # Aceptación
         if d_max < d_tabla:
-            conclusion = "Uniformes (Aceptados) ✅"
+            conclusion = "Uniformes (Aceptados) "
             color_conclusion = ESTILOS.GREEN
             self.veredicto_frame.configure(fg_color="#0A3D2E", border_color=ESTILOS.GREEN, border_width=2)
         else:
-            conclusion = "No Uniformes (Rechazados) ❌"
+            conclusion = "No Uniformes (Rechazados) "
             color_conclusion = ESTILOS.RED
             self.veredicto_frame.configure(fg_color="#3D0A0A", border_color=ESTILOS.RED, border_width=2)
 

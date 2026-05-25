@@ -1,6 +1,4 @@
-# ==============================================================================
-# VERIFICACIÓN E INSTALACIÓN AUTOMÁTICA DE LIBRERÍAS (Para el Profesor)
-# ==============================================================================
+
 import importlib
 import subprocess
 import sys
@@ -318,7 +316,7 @@ class GeneradorNumerosApp(ctk.CTk):
 
         total_numeros = filas_num * columnas_num
         self.tar_total.configure(text=str(total_numeros))
-        self.tar_archivo.configure(text="Guardado ✅", text_color=ESTILOS.GREEN)
+        self.tar_archivo.configure(text="Guardado ", text_color=ESTILOS.GREEN)
 
         self.veredicto_frame.configure(fg_color="#0A3D2E", border_color=ESTILOS.GREEN, border_width=2)
         self.lbl_resumen.configure(

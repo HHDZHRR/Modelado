@@ -1,6 +1,3 @@
-# ==============================================================================
-# VERIFICACIÓN E INSTALACIÓN AUTOMÁTICA DE LIBRERÍAS (Para el Profesor)
-# ==============================================================================
 import importlib
 import subprocess
 import sys
@@ -39,7 +36,7 @@ RUTA_CSV_PREDETERMINADA = os.path.join(
 )
 
 # ==========================================
-# DATOS Y DISTRIBUCIONES (Basados en el PDF)
+# DATOS Y DISTRIBUCIONES
 # ==========================================
 DEFAULT_RN_COL1 = [0.63325, 0.48355, 0.98977, 0.06533, 0.45128, 0.15486, 0.19241, 0.15997, 
                    0.67940, 0.90872, 0.58997, 0.68691, 0.73488, 0.98564, 0.89745]
@@ -653,6 +650,6 @@ class ColaSimulatorApp(ctk.CTk):
                             f"👉 Costo Total: ${best_cost:,.2f}")
 
 if __name__ == "__main__":
-    import tkinter as tk  # Importación local para compatibilidad interna de Tkinter en inicializaciones
+    import tkinter as tk  
     app = ColaSimulatorApp()
     app.mainloop()

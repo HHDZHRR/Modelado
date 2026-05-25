@@ -1,6 +1,3 @@
-# ==============================================================================
-# VERIFICACIÓN E INSTALACIÓN AUTOMÁTICA DE LIBRERÍAS (Para el Profesor)
-# ==============================================================================
 import importlib
 import subprocess
 import sys
@@ -28,10 +25,6 @@ import customtkinter as ctk
 import ESTILOS
 from tkinter import ttk, messagebox
 
-
-# ============================================================
-# SIMULADOR DE VOLADOS - MODELADO Y SIMULACIÓN DE SISTEMAS
-# ============================================================
 # Reglas:
 # - Si el número rectangular es <= 0.5, se gana el volado.
 # - Si es > 0.5, se pierde el volado.
@@ -41,13 +34,10 @@ from tkinter import ttk, messagebox
 # - Una corrida termina únicamente en META o QUIEBRA.
 # - Una corrida inconclusa puede mostrarse en tabla, pero NO se
 #   cuenta en estadísticas ni probabilidades.
-# ============================================================
 
 ESTILOS.aplicar_tema()
 
 
-# Ruta automática: el CSV debe estar dentro de una carpeta DATOS
-# ubicada junto al archivo Python del programa.
 DIRECTORIO_PROGRAMA = os.path.dirname(os.path.abspath(__file__))
 RUTA_CSV_PREDETERMINADA = os.path.join(
     DIRECTORIO_PROGRAMA,
@@ -172,9 +162,7 @@ class SimuladorVoladosApp(ctk.CTk):
         self.crear_interfaz()
         self.cargar_csv(self.ruta_csv, mostrar_error=False)
 
-    # ========================================================
-    # INTERFAZ
-    # ========================================================
+
     def configurar_estilo_tabla(self):
         ESTILOS.configurar_tabla()
 
@@ -226,9 +214,6 @@ class SimuladorVoladosApp(ctk.CTk):
 
         self.crear_separador(panel)
 
-        # ----------------------------------------------------
-        # Tipo de corridas
-        # ----------------------------------------------------
         ctk.CTkLabel(
             panel,
             text="Modo de corridas:",
@@ -307,9 +292,7 @@ class SimuladorVoladosApp(ctk.CTk):
         )
         self.btn_origen_numeros.pack(fill="x", padx=12, pady=(0, 10))
 
-        # ----------------------------------------------------
-        # FORMULARIO CSV / COLUMNA
-        # ----------------------------------------------------
+
         self.frame_csv = ctk.CTkFrame(
             panel,
             fg_color=ESTILOS.CARD,
@@ -394,9 +377,6 @@ class SimuladorVoladosApp(ctk.CTk):
         )
         self.lbl_info_columna.pack(fill="x", padx=10, pady=(6, 10))
 
-        # ----------------------------------------------------
-        # Formulario manual de números
-        # ----------------------------------------------------
         self.frame_numeros_manual = ctk.CTkFrame(
             panel,
             fg_color=ESTILOS.CARD,
@@ -602,9 +582,6 @@ class SimuladorVoladosApp(ctk.CTk):
         valor.place(relx=0.5, rely=0.7, anchor="center")
         return valor
 
-    # ========================================================
-    # MODOS DEL FORMULARIO
-    # ========================================================
     def cambiar_modo_corridas(self, modo):
         if modo == "Manual":
             self.lbl_modo_automatico.pack_forget()
@@ -633,9 +610,6 @@ class SimuladorVoladosApp(ctk.CTk):
                 before=self.btn_simular
             )
 
-    # ========================================================
-    # ARCHIVO CSV Y LECTURA DE NÚMEROS
-    # ========================================================
     def cargar_csv(self, ruta=None, mostrar_error=True):
         """Carga el CSV desde la ruta indicada o la predeterminada."""
         if ruta is None:
@@ -776,9 +750,6 @@ class SimuladorVoladosApp(ctk.CTk):
         numeros = [self.convertir_rectangular(elemento) for elemento in elementos]
         return numeros, "Captura manual"
 
-    # ========================================================
-    # EJECUCIÓN Y ESTADÍSTICAS
-    # ========================================================
     def obtener_parametros(self):
         try:
             inicial = float(self.ent_cantidad.get())
