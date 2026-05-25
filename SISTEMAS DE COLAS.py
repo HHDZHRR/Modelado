@@ -1,3 +1,27 @@
+# ==============================================================================
+# VERIFICACIÓN E INSTALACIÓN AUTOMÁTICA DE LIBRERÍAS (Para el Profesor)
+# ==============================================================================
+import importlib
+import subprocess
+import sys
+
+for pkg, spec in [
+    ("customtkinter", "customtkinter==5.2.2"),
+    ("matplotlib", "matplotlib==3.10.9"),
+    ("numpy", "numpy==2.4.6"),
+    ("PIL", "pillow==12.2.0"),
+    ("scipy", "scipy==1.17.1")
+]:
+    try:
+        importlib.import_module(pkg)
+    except ImportError:
+        print(f"Instalando libreria faltante: {spec}...")
+        try:
+            subprocess.check_call([sys.executable, "-m", "pip", "install", spec])
+        except Exception as e:
+            print(f"Error al instalar {spec}: {e}")
+# ==============================================================================
+
 import customtkinter as ctk
 import ESTILOS
 from tkinter import ttk, messagebox
