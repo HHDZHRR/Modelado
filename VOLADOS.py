@@ -1,6 +1,7 @@
 import csv
 import os
 import customtkinter as ctk
+import ESTILOS
 from tkinter import ttk, messagebox
 
 
@@ -18,8 +19,8 @@ from tkinter import ttk, messagebox
 #   cuenta en estadísticas ni probabilidades.
 # ============================================================
 
-ctk.set_appearance_mode("light")
-ctk.set_default_color_theme("blue")
+ESTILOS.aplicar_tema()
+
 
 # Ruta automática: el CSV debe estar dentro de una carpeta DATOS
 # ubicada junto al archivo Python del programa.
@@ -135,6 +136,7 @@ class SimuladorVoladosApp(ctk.CTk):
 
         self.title("Simulador de Volados | Modelado y Simulación")
         self.geometry("1500x850")
+        self.configure(fg_color=ESTILOS.BG)
         self.minsize(1220, 730)
 
         self.ruta_csv = RUTA_CSV_PREDETERMINADA
@@ -149,36 +151,20 @@ class SimuladorVoladosApp(ctk.CTk):
     # INTERFAZ
     # ========================================================
     def configurar_estilo_tabla(self):
-        estilo = ttk.Style()
-        estilo.theme_use("clam")
-
-        estilo.configure(
-            "Treeview",
-            font=("Arial", 11),
-            rowheight=31,
-            background="white",
-            fieldbackground="white"
-        )
-        estilo.configure(
-            "Treeview.Heading",
-            font=("Arial", 10, "bold"),
-            foreground="white",
-            background="#155e94",
-            padding=8
-        )
-        estilo.map("Treeview", background=[("selected", "#cde9ff")])
+        ESTILOS.configurar_tabla()
 
     def crear_interfaz(self):
         ctk.CTkLabel(
             self,
             text="SIMULADOR DEL PROBLEMA DE VOLADOS",
-            font=ctk.CTkFont(size=26, weight="bold")
+            font=ctk.CTkFont(size=26, weight="bold"),
+            text_color=ESTILOS.WHITE
         ).pack(pady=(16, 3))
 
         ctk.CTkLabel(
             self,
             text="Números rectangulares desde CSV o captura manual • Corridas automáticas o manuales",
-            text_color="#555555",
+            text_color=ESTILOS.MUTED,
             font=ctk.CTkFont(size=14)
         ).pack(pady=(0, 14))
 
@@ -192,13 +178,21 @@ class SimuladorVoladosApp(ctk.CTk):
 
     def crear_panel_datos(self, padre):
         # Scroll para que jamás se pierda el formulario de columna
-        panel = ctk.CTkScrollableFrame(padre, width=365)
+        panel = ctk.CTkScrollableFrame(
+            padre,
+            width=365,
+            fg_color=ESTILOS.PANEL,
+            corner_radius=10,
+            border_color=ESTILOS.BORDER,
+            border_width=1
+        )
         panel.grid(row=0, column=0, sticky="nsew", padx=(0, 14))
 
         ctk.CTkLabel(
             panel,
             text="Datos del experimento",
-            font=ctk.CTkFont(size=19, weight="bold")
+            font=ctk.CTkFont(size=19, weight="bold"),
+            text_color=ESTILOS.WHITE
         ).pack(pady=(8, 12))
 
         self.ent_cantidad = self.crear_campo(panel, "Cantidad inicial:", "50")
@@ -214,16 +208,18 @@ class SimuladorVoladosApp(ctk.CTk):
             panel,
             text="Modo de corridas:",
             anchor="w",
+            text_color=ESTILOS.MUTED,
             font=ctk.CTkFont(size=13, weight="bold")
         ).pack(fill="x", padx=12, pady=(5, 5))
 
         self.modo_corridas = ctk.StringVar(value="Automático")
-        ctk.CTkSegmentedButton(
+        self.btn_modo_corridas = ctk.CTkSegmentedButton(
             panel,
             values=["Automático", "Manual"],
             variable=self.modo_corridas,
             command=self.cambiar_modo_corridas
-        ).pack(fill="x", padx=12, pady=(0, 8))
+        )
+        self.btn_modo_corridas.pack(fill="x", padx=12, pady=(0, 8))
 
         self.lbl_modo_automatico = ctk.CTkLabel(
             panel,
@@ -233,7 +229,7 @@ class SimuladorVoladosApp(ctk.CTk):
             ),
             justify="left",
             anchor="w",
-            text_color="#5d6670",
+            text_color=ESTILOS.MUTED,
             font=ctk.CTkFont(size=11)
         )
         self.lbl_modo_automatico.pack(fill="x", padx=12, pady=(0, 5))
@@ -243,9 +239,16 @@ class SimuladorVoladosApp(ctk.CTk):
             self.frame_corridas_manual,
             text="Cantidad de corridas concluidas:",
             anchor="w",
+            text_color=ESTILOS.MUTED,
             font=ctk.CTkFont(size=13, weight="bold")
         ).pack(fill="x", pady=(0, 4))
-        self.ent_corridas = ctk.CTkEntry(self.frame_corridas_manual, height=34)
+        self.ent_corridas = ctk.CTkEntry(
+            self.frame_corridas_manual,
+            height=34,
+            fg_color=ESTILOS.CARD,
+            border_color=ESTILOS.BORDER,
+            text_color=ESTILOS.WHITE
+        )
         self.ent_corridas.pack(fill="x")
         self.ent_corridas.insert(0, "5")
         ctk.CTkLabel(
@@ -253,7 +256,7 @@ class SimuladorVoladosApp(ctk.CTk):
             text="Se detiene al completar esa cantidad.",
             justify="left",
             anchor="w",
-            text_color="#5d6670",
+            text_color=ESTILOS.MUTED,
             font=ctk.CTkFont(size=11)
         ).pack(fill="x", pady=(4, 0))
 
@@ -266,27 +269,35 @@ class SimuladorVoladosApp(ctk.CTk):
             panel,
             text="Origen de números rectangulares:",
             anchor="w",
+            text_color=ESTILOS.MUTED,
             font=ctk.CTkFont(size=13, weight="bold")
         ).pack(fill="x", padx=12, pady=(5, 5))
 
         self.origen_numeros = ctk.StringVar(value="CSV")
-        ctk.CTkSegmentedButton(
+        self.btn_origen_numeros = ctk.CTkSegmentedButton(
             panel,
             values=["CSV", "Manual"],
             variable=self.origen_numeros,
             command=self.cambiar_origen_numeros
-        ).pack(fill="x", padx=12, pady=(0, 10))
+        )
+        self.btn_origen_numeros.pack(fill="x", padx=12, pady=(0, 10))
 
         # ----------------------------------------------------
         # FORMULARIO CSV / COLUMNA
         # ----------------------------------------------------
-        self.frame_csv = ctk.CTkFrame(panel, fg_color="#eef4fa")
+        self.frame_csv = ctk.CTkFrame(
+            panel,
+            fg_color=ESTILOS.CARD,
+            border_color=ESTILOS.BORDER,
+            border_width=1
+        )
         self.frame_csv.pack(fill="x", padx=12, pady=(0, 10))
 
         ctk.CTkLabel(
             self.frame_csv,
             text="Archivo CSV de números",
-            font=ctk.CTkFont(size=13, weight="bold")
+            font=ctk.CTkFont(size=13, weight="bold"),
+            text_color=ESTILOS.WHITE
         ).pack(fill="x", padx=10, pady=(10, 6))
 
         self.lbl_archivo = ctk.CTkLabel(
@@ -295,7 +306,7 @@ class SimuladorVoladosApp(ctk.CTk):
             wraplength=290,
             justify="left",
             anchor="w",
-            text_color="#155e94",
+            text_color=ESTILOS.GREEN,
             font=ctk.CTkFont(size=12, weight="bold")
         )
         self.lbl_archivo.pack(fill="x", padx=10, pady=(0, 4))
@@ -306,7 +317,7 @@ class SimuladorVoladosApp(ctk.CTk):
             wraplength=290,
             justify="left",
             anchor="w",
-            text_color="#5d6670",
+            text_color=ESTILOS.MUTED,
             font=ctk.CTkFont(size=11)
         )
         self.lbl_estado_archivo.pack(fill="x", padx=10, pady=(0, 7))
@@ -316,14 +327,18 @@ class SimuladorVoladosApp(ctk.CTk):
             text="Seleccionar CSV",
             command=self.seleccionar_csv,
             height=33,
-            fg_color="#4b718c",
-            hover_color="#36566d"
+            fg_color=ESTILOS.CARD,
+            text_color=ESTILOS.WHITE,
+            border_color=ESTILOS.BORDER,
+            border_width=1,
+            hover_color=ESTILOS.PANEL
         ).pack(fill="x", padx=10, pady=(0, 10))
 
         ctk.CTkLabel(
             self.frame_csv,
             text="Columna del archivo CSV:",
             anchor="w",
+            text_color=ESTILOS.MUTED,
             font=ctk.CTkFont(size=13, weight="bold")
         ).pack(fill="x", padx=10, pady=(0, 5))
 
@@ -333,7 +348,14 @@ class SimuladorVoladosApp(ctk.CTk):
             values=["1"],
             variable=self.columna_seleccionada,
             command=self.actualizar_info_columna,
-            height=35
+            height=35,
+            fg_color=ESTILOS.CARD,
+            button_color=ESTILOS.BORDER,
+            button_hover_color=ESTILOS.PANEL,
+            text_color=ESTILOS.WHITE,
+            dropdown_fg_color=ESTILOS.CARD,
+            dropdown_hover_color=ESTILOS.PANEL,
+            dropdown_text_color=ESTILOS.WHITE
         )
         self.menu_columna.pack(fill="x", padx=10)
 
@@ -342,7 +364,7 @@ class SimuladorVoladosApp(ctk.CTk):
             text="Carga el CSV para detectar sus columnas.",
             justify="left",
             anchor="w",
-            text_color="#5d6670",
+            text_color=ESTILOS.MUTED,
             font=ctk.CTkFont(size=11)
         )
         self.lbl_info_columna.pack(fill="x", padx=10, pady=(6, 10))
@@ -350,18 +372,28 @@ class SimuladorVoladosApp(ctk.CTk):
         # ----------------------------------------------------
         # Formulario manual de números
         # ----------------------------------------------------
-        self.frame_numeros_manual = ctk.CTkFrame(panel, fg_color="#eef4fa")
+        self.frame_numeros_manual = ctk.CTkFrame(
+            panel,
+            fg_color=ESTILOS.CARD,
+            border_color=ESTILOS.BORDER,
+            border_width=1
+        )
 
         ctk.CTkLabel(
             self.frame_numeros_manual,
             text="Captura de números rectangulares",
-            font=ctk.CTkFont(size=13, weight="bold")
+            font=ctk.CTkFont(size=13, weight="bold"),
+            text_color=ESTILOS.WHITE
         ).pack(fill="x", padx=10, pady=(10, 6))
 
         self.txt_numeros = ctk.CTkTextbox(
             self.frame_numeros_manual,
             height=190,
-            font=ctk.CTkFont(size=12)
+            font=ctk.CTkFont(size=12),
+            fg_color=ESTILOS.CARD,
+            text_color=ESTILOS.WHITE,
+            border_color=ESTILOS.BORDER,
+            border_width=1
         )
         self.txt_numeros.pack(fill="x", padx=10)
 
@@ -379,7 +411,7 @@ class SimuladorVoladosApp(ctk.CTk):
             wraplength=300,
             justify="left",
             anchor="w",
-            text_color="#5d6670",
+            text_color=ESTILOS.MUTED,
             font=ctk.CTkFont(size=11)
         ).pack(fill="x", padx=10, pady=(5, 10))
 
@@ -387,6 +419,9 @@ class SimuladorVoladosApp(ctk.CTk):
             panel,
             text="SIMULAR",
             height=43,
+            fg_color=ESTILOS.GREEN,
+            text_color=ESTILOS.BG,
+            hover_color="#00B889",
             font=ctk.CTkFont(size=15, weight="bold"),
             command=self.simular
         )
@@ -396,13 +431,16 @@ class SimuladorVoladosApp(ctk.CTk):
             panel,
             text="LIMPIAR RESULTADOS",
             height=38,
-            fg_color="#667085",
-            hover_color="#525d70",
+            fg_color=ESTILOS.CARD,
+            text_color=ESTILOS.WHITE,
+            border_color=ESTILOS.BORDER,
+            border_width=1,
+            hover_color=ESTILOS.PANEL,
             command=self.limpiar_resultados
         ).pack(fill="x", padx=12, pady=(0, 12))
 
     def crear_separador(self, padre):
-        separador = ctk.CTkFrame(padre, height=1, fg_color="#d4dce4")
+        separador = ctk.CTkFrame(padre, height=1, fg_color=ESTILOS.BORDER)
         separador.pack(fill="x", padx=12, pady=12)
         return separador
 
@@ -411,16 +449,23 @@ class SimuladorVoladosApp(ctk.CTk):
             padre,
             text=texto,
             anchor="w",
+            text_color=ESTILOS.MUTED,
             font=ctk.CTkFont(size=13, weight="bold")
         ).pack(fill="x", padx=12, pady=(5, 4))
 
-        entrada = ctk.CTkEntry(padre, height=34)
+        entrada = ctk.CTkEntry(
+            padre,
+            height=34,
+            fg_color=ESTILOS.CARD,
+            border_color=ESTILOS.BORDER,
+            text_color=ESTILOS.WHITE
+        )
         entrada.pack(fill="x", padx=12)
         entrada.insert(0, valor)
         return entrada
 
     def crear_panel_resultados(self, padre):
-        panel = ctk.CTkFrame(padre)
+        panel = ctk.CTkFrame(padre, fg_color="transparent")
         panel.grid(row=0, column=1, sticky="nsew")
         panel.grid_columnconfigure(0, weight=1)
         panel.grid_rowconfigure(1, weight=1)
@@ -428,7 +473,8 @@ class SimuladorVoladosApp(ctk.CTk):
         ctk.CTkLabel(
             panel,
             text="Tabla de simulación",
-            font=ctk.CTkFont(size=19, weight="bold")
+            font=ctk.CTkFont(size=19, weight="bold"),
+            text_color=ESTILOS.WHITE
         ).grid(row=0, column=0, pady=(15, 10))
 
         marco_tabla = ctk.CTkFrame(panel, fg_color="transparent")
@@ -472,7 +518,7 @@ class SimuladorVoladosApp(ctk.CTk):
         barra_y.grid(row=0, column=1, sticky="ns")
         barra_x.grid(row=1, column=0, sticky="ew")
 
-        tarjetas = ctk.CTkFrame(panel)
+        tarjetas = ctk.CTkFrame(panel, fg_color="transparent")
         tarjetas.grid(row=2, column=0, sticky="ew", padx=14, pady=(13, 8))
         for i in range(5):
             tarjetas.grid_columnconfigure(i, weight=1)
@@ -483,33 +529,52 @@ class SimuladorVoladosApp(ctk.CTk):
         self.tar_p_meta = self.crear_tarjeta(tarjetas, "P(Meta)", 3)
         self.tar_p_quiebra = self.crear_tarjeta(tarjetas, "P(Quiebra)", 4)
 
-        self.lbl_resumen = ctk.CTkLabel(
+        # Tarjeta de Verificación/Veredicto al pie
+        self.veredicto_frame = ctk.CTkFrame(
             panel,
+            fg_color=ESTILOS.CARD,
+            height=65,
+            corner_radius=10,
+            border_color=ESTILOS.BORDER,
+            border_width=1
+        )
+        self.veredicto_frame.grid(row=3, column=0, sticky="ew", padx=14, pady=(0, 14))
+        self.veredicto_frame.grid_propagate(False)
+
+        self.lbl_resumen = ctk.CTkLabel(
+            self.veredicto_frame,
             text="Configura el experimento y presiona SIMULAR.",
             font=ctk.CTkFont(size=13, weight="bold"),
-            justify="left",
-            anchor="w"
+            text_color=ESTILOS.MUTED
         )
-        self.lbl_resumen.grid(row=3, column=0, sticky="ew", padx=18, pady=(0, 14))
+        self.lbl_resumen.place(relx=0.5, rely=0.5, anchor="center")
 
     def crear_tarjeta(self, padre, titulo, columna):
-        tarjeta = ctk.CTkFrame(padre, fg_color="#eef4fa")
-        tarjeta.grid(row=0, column=columna, sticky="ew", padx=5, pady=6)
+        tarjeta = ctk.CTkFrame(
+            padre,
+            fg_color=ESTILOS.CARD,
+            corner_radius=10,
+            height=80,
+            border_color=ESTILOS.BORDER,
+            border_width=1
+        )
+        tarjeta.grid(row=0, column=columna, sticky="ew", padx=3, pady=6)
+        tarjeta.grid_propagate(False)
 
         ctk.CTkLabel(
             tarjeta,
             text=titulo,
-            text_color="#425466",
-            font=ctk.CTkFont(size=12, weight="bold")
-        ).pack(pady=(8, 2))
+            text_color=ESTILOS.MUTED,
+            font=ctk.CTkFont(size=11, weight="bold")
+        ).place(relx=0.5, rely=0.3, anchor="center")
 
         valor = ctk.CTkLabel(
             tarjeta,
             text="—",
-            text_color="#0e5689",
+            text_color=ESTILOS.WHITE,
             font=ctk.CTkFont(size=20, weight="bold")
         )
-        valor.pack(pady=(0, 8))
+        valor.place(relx=0.5, rely=0.7, anchor="center")
         return valor
 
     # ========================================================
@@ -559,7 +624,7 @@ class SimuladorVoladosApp(ctk.CTk):
             self.columna_seleccionada.set("1")
             self.lbl_estado_archivo.configure(
                 text="No encontrado. Colócalo en DATOS o selecciona otro.",
-                text_color="#b45309"
+                text_color=ESTILOS.AMBER
             )
             self.lbl_info_columna.configure(
                 text="No se han detectado columnas."
@@ -578,7 +643,7 @@ class SimuladorVoladosApp(ctk.CTk):
             self.total_columnas_csv = 0
             self.lbl_estado_archivo.configure(
                 text="Archivo encontrado, pero no se pudo leer.",
-                text_color="#b42318"
+                text_color=ESTILOS.RED
             )
             if mostrar_error:
                 messagebox.showerror("Error al leer CSV", str(error))
@@ -596,7 +661,7 @@ class SimuladorVoladosApp(ctk.CTk):
 
         self.lbl_estado_archivo.configure(
             text="Archivo cargado correctamente.",
-            text_color="#146c43"
+            text_color=ESTILOS.GREEN
         )
         self.actualizar_info_columna(seleccion)
         return True
@@ -748,17 +813,23 @@ class SimuladorVoladosApp(ctk.CTk):
 
         if self.modo_corridas.get() == "Automático":
             estado = "Modo automático: se consumieron todos los números disponibles."
-            color = "#17496b"
+            color_texto = ESTILOS.GREEN
+            fg_color_card = "#0A3D2E"
+            border_color_card = ESTILOS.GREEN
         elif concluidas >= objetivo:
             estado = f"Modo manual: se completaron las {objetivo} corridas solicitadas."
-            color = "#146c43"
+            color_texto = ESTILOS.GREEN
+            fg_color_card = "#0A3D2E"
+            border_color_card = ESTILOS.GREEN
         else:
             faltan = objetivo - concluidas
             estado = (
                 f"Modo manual: no alcanzaron los números; "
                 f"faltaron {faltan} corrida(s) concluida(s)."
             )
-            color = "#b45309"
+            color_texto = ESTILOS.AMBER
+            fg_color_card = "#3B260F"
+            border_color_card = ESTILOS.AMBER
 
         inconclusa = (
             "Sí; se muestra en tabla pero no cuenta."
@@ -774,6 +845,11 @@ class SimuladorVoladosApp(ctk.CTk):
         else:
             formulas = "No existen corridas concluidas para calcular probabilidades."
 
+        self.veredicto_frame.configure(
+            fg_color=fg_color_card,
+            border_color=border_color_card,
+            border_width=2
+        )
         self.lbl_resumen.configure(
             text=(
                 f"{estado}\n"
@@ -781,7 +857,7 @@ class SimuladorVoladosApp(ctk.CTk):
                 f"Corrida inconclusa: {inconclusa}\n"
                 f"{formulas}"
             ),
-            text_color=color
+            text_color=color_texto
         )
 
     def limpiar_resultados(self):
@@ -794,9 +870,14 @@ class SimuladorVoladosApp(ctk.CTk):
         self.tar_p_meta.configure(text="—")
         self.tar_p_quiebra.configure(text="—")
 
+        self.veredicto_frame.configure(
+            fg_color=ESTILOS.CARD,
+            border_color=ESTILOS.BORDER,
+            border_width=1
+        )
         self.lbl_resumen.configure(
             text="Configura el experimento y presiona SIMULAR.",
-            text_color=("black", "white")
+            text_color=ESTILOS.MUTED
         )
 
 

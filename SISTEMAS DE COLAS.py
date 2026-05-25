@@ -40,7 +40,24 @@ def get_value(rn, cdf_dict):
             return value
     return list(cdf_dict.keys())[-1]
 
-def simulate_warehouse_data(num_workers, rn_col1, rn_col2):
+def parse_hhmm(time_str):
+    try:
+        parts = time_str.strip().split(":")
+        hours = int(parts[0])
+        mins = int(parts[1])
+        if not (0 <= hours < 24 and 0 <= mins < 60):
+            raise ValueError()
+        return hours * 60 + mins
+    except Exception:
+        raise ValueError("La hora de inicio debe tener el formato HH:MM (de 00:00 a 23:59).")
+
+def minutes_to_hhmm(minutes):
+    total_min = int(round(minutes))
+    hours = (total_min // 60) % 24
+    mins = total_min % 60
+    return f"{hours:02d}:{mins:02d}"
+
+def simulate_warehouse_data(num_workers, rn_col1, rn_col2, start_time_minutes=660):
     break_start_limit = 240
     break_duration = 30
     shift_end = 510 
@@ -56,6 +73,13 @@ def simulate_warehouse_data(num_workers, rn_col1, rn_col2):
     
     # Generar tiempos de llegada
     truck_arrivals = [0] * initial_trucks
+    inter_arrivals = [0] * initial_trucks
+    rn_arrivals = [""] * initial_trucks
+    if initial_trucks > 0:
+        rn_arrivals[0] = f"{rn_initial:.5f}"
+        for k in range(1, initial_trucks):
+            rn_arrivals[k] = "-"
+            
     current_arrival_time = 0
     
     while rn_arr_idx < len(rn_col1):
@@ -65,6 +89,8 @@ def simulate_warehouse_data(num_workers, rn_col1, rn_col2):
         if current_arrival_time > shift_end:
             break
         truck_arrivals.append(current_arrival_time)
+        inter_arrivals.append(inter_arrival)
+        rn_arrivals.append(f"{rn_arr:.5f}")
         rn_arr_idx += 1
 
     server_available_time = 0
@@ -72,6 +98,7 @@ def simulate_warehouse_data(num_workers, rn_col1, rn_col2):
     total_wait_time = 0
     
     table_rows = []
+    start_service_times = []
     
     for i, arrival_time in enumerate(truck_arrivals):
         # Lógica del descanso a las 3:00 a.m.
@@ -102,15 +129,38 @@ def simulate_warehouse_data(num_workers, rn_col1, rn_col2):
             
         server_available_time = end_service_time
         
-        # Guardar fila para la tabla
+        # Calcular longitud de la cola al momento de la llegada
+        if i < initial_trucks:
+            queue_length = initial_trucks - i
+        else:
+            queue_length = sum(1 for prev_start in start_service_times if prev_start > arrival_time)
+            if wait_time > 0:
+                queue_length += 1
+                
+        start_service_times.append(start_service_time)
+        
+        # Guardar fila para la tabla:
+        # 1. Numero Aleatorio
+        # 2. Tiempo entre llegadas (min)
+        # 3. Hora de tiempo de llegada (HH:MM)
+        # 4. Hora de inicio del servicio (HH:MM)
+        # 5. Numero Alearotio
+        # 6. Tiempo de servicio (min)
+        # 7. Hora de fin del servicio (HH:MM)
+        # 8. Ocio del personal (sin "min")
+        # 9. Tiempo de espera del camion (min)
+        # 10. Longitud de la cola
         table_rows.append((
-            i + 1, 
-            f"{arrival_time} min", 
-            f"{start_service_time} min", 
-            f"{service_time} min", 
-            f"{end_service_time} min", 
-            f"{idle_time} min", 
-            f"{wait_time} min"
+            rn_arrivals[i] if i < len(rn_arrivals) else "-",
+            f"{inter_arrivals[i]} min" if i < len(inter_arrivals) else "- min",
+            minutes_to_hhmm(start_time_minutes + arrival_time),
+            minutes_to_hhmm(start_time_minutes + start_service_time),
+            f"{rn_srv:.5f}",
+            f"{service_time} min",
+            minutes_to_hhmm(start_time_minutes + end_service_time),
+            f"{idle_time}",
+            f"{wait_time} min",
+            f"{queue_length}"
         ))
 
     # Cálculo de costos
@@ -271,6 +321,9 @@ class ColaSimulatorApp(ctk.CTk):
         self.ent_col2 = self.crear_campo(self.frame_csv_cont, "Col. Servicio (1-10):", "2")
         self.ent_reng = self.crear_campo(self.frame_csv_cont, "Bloque de Renglón (1+):", "1")
 
+        # Hora de inicio del simulador
+        self.ent_hora_inicio = self.crear_campo(panel_entrada, "Hora de inicio (HH:MM):", "11:00")
+
         # Tamaño del equipo (Segmented Button)
         ctk.CTkLabel(
             panel_entrada,
@@ -353,18 +406,44 @@ class ColaSimulatorApp(ctk.CTk):
         marco_tabla.grid_rowconfigure(0, weight=1)
         marco_tabla.grid_columnconfigure(0, weight=1)
 
-        columns = ("camion", "llegada", "inicio", "servicio", "fin", "ocio", "espera")
+        columns = (
+            "rn_llegada",
+            "tiempo_llegada",
+            "hora_llegada",
+            "hora_inicio",
+            "rn_servicio",
+            "tiempo_servicio",
+            "hora_fin",
+            "ocio",
+            "espera",
+            "cola"
+        )
         self.tree = ttk.Treeview(marco_tabla, columns=columns, show="headings")
 
-        headings = ["No. Camión", "Llegada", "Inicio Servicio", "T. Servicio", "Fin Servicio", "Ocio Personal", "Espera Camión"]
+        headings = [
+            "Número Aleatorio",
+            "Tiempo entre llegadas",
+            "Hora de tiempo de llegada",
+            "Hora de inicio del servicio",
+            "Número Aleatorio",
+            "Tiempo de servicio",
+            "Hora de fin del servicio",
+            "Ocio del personal",
+            "Tiempo de espera del camión",
+            "Longitud de la cola"
+        ]
+        
         anchos = {
-            "camion": 90,
-            "llegada": 110,
-            "inicio": 130,
-            "servicio": 110,
-            "fin": 130,
+            "rn_llegada": 120,
+            "tiempo_llegada": 150,
+            "hora_llegada": 170,
+            "hora_inicio": 180,
+            "rn_servicio": 120,
+            "tiempo_servicio": 130,
+            "hora_fin": 170,
             "ocio": 130,
-            "espera": 130
+            "espera": 180,
+            "cola": 130
         }
 
         for col, head in zip(columns, headings):
@@ -501,11 +580,12 @@ class ColaSimulatorApp(ctk.CTk):
         try:
             workers = int(self.equipo_var.get())
             rn_col1, rn_col2, origen = self.obtener_numeros()
+            start_time_minutes = parse_hhmm(self.ent_hora_inicio.get())
         except Exception as e:
             messagebox.showerror("Error", str(e))
             return
             
-        rows, stats = simulate_warehouse_data(workers, rn_col1, rn_col2)
+        rows, stats = simulate_warehouse_data(workers, rn_col1, rn_col2, start_time_minutes)
         
         # Llenar tabla
         for row in rows:
@@ -528,6 +608,7 @@ class ColaSimulatorApp(ctk.CTk):
     def find_optimal(self):
         try:
             rn_col1, rn_col2, origen = self.obtener_numeros()
+            start_time_minutes = parse_hhmm(self.ent_hora_inicio.get())
         except Exception as e:
             messagebox.showerror("Error", str(e))
             return
@@ -536,7 +617,7 @@ class ColaSimulatorApp(ctk.CTk):
         best_workers = 0
         
         for w in [3, 4, 5, 6]:
-            _, stats = simulate_warehouse_data(w, rn_col1, rn_col2)
+            _, stats = simulate_warehouse_data(w, rn_col1, rn_col2, start_time_minutes)
             if stats["costo_total"] < best_cost:
                 best_cost = stats["costo_total"]
                 best_workers = w
