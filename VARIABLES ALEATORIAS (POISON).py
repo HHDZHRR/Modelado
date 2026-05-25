@@ -74,6 +74,7 @@ class GeneracionPoissonApp(ctk.CTk):
 
         self.title("Generación Variable Poisson | Modelado y Simulación")
         self.geometry("1150x750")
+        self.state('zoomed')
         self.configure(fg_color=ESTILOS.BG)
         self.minsize(950, 600)
 

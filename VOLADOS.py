@@ -160,6 +160,7 @@ class SimuladorVoladosApp(ctk.CTk):
 
         self.title("Simulador de Volados | Modelado y Simulación")
         self.geometry("1500x850")
+        self.state('zoomed')
         self.configure(fg_color=ESTILOS.BG)
         self.minsize(1220, 730)
 

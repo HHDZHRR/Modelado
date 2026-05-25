@@ -74,6 +74,7 @@ class PruebaFrecuenciasApp(ctk.CTk):
 
         self.title("Prueba de Frecuencias (Chi-Cuadrada) | Modelado y Simulación")
         self.geometry("1150x750")
+        self.state('zoomed')
         self.configure(fg_color=ESTILOS.BG)
         self.minsize(950, 600)
 

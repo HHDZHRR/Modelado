@@ -75,6 +75,7 @@ class PeriodosEsperadosApp(ctk.CTk):
 
         self.title("Periodos Esperados | Modelado y Simulación")
         self.geometry("700x520")
+        self.state('zoomed')
         self.configure(fg_color=ESTILOS.BG)
         self.minsize(600, 450)
 

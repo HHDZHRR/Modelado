@@ -76,6 +76,7 @@ class AppMonteCarlo(ctk.CTk):
         super().__init__()
         self.title("Simulador Monte Carlo - Evaluación de Proyectos")
         self.geometry("1100x650")
+        self.state('zoomed')
         self.configure(fg_color=BG)
         self.minsize(900, 600)
 

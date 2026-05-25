@@ -253,6 +253,7 @@ class ColaSimulatorApp(ctk.CTk):
         super().__init__()
         self.title("Simulador de Colas | Modelado y Simulación")
         self.geometry("1200x750")
+        self.state('zoomed')
         self.configure(fg_color=ESTILOS.BG)
         self.minsize(1050, 600)
         

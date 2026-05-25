@@ -74,6 +74,7 @@ class PruebaSeriesApp(ctk.CTk):
 
         self.title("Prueba de Series | Modelado y Simulación")
         self.geometry("1200x780")
+        self.state('zoomed')
         self.configure(fg_color=ESTILOS.BG)
         self.minsize(1000, 600)
 

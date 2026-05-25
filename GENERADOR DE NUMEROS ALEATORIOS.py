@@ -45,6 +45,7 @@ class GeneradorNumerosApp(ctk.CTk):
 
         self.title("Generador de Números Aleatorios | Modelado y Simulación")
         self.geometry("1100x700")
+        self.state('zoomed')
         self.configure(fg_color=ESTILOS.BG)
         self.minsize(900, 580)
 
